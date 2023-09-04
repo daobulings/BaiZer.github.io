@@ -16,15 +16,15 @@
   <meta name="author" content="BaiZer">
   <meta name="keywords" content="">
   
-    <meta name="description" content="​ 一、构建API接口：1.什么是API？API是应用程序编程接口的缩写，是一些预先定义的函数，或指软件系统不同组成部分衔接的约定，用来提供应用程序与开发人员基于某软件或硬件得以访问的一组例程，而又无需访问原码，或理解内部工作机制的细节。 API本身是抽象的，它仅定义了一个界面，而不涉及应用程序在实际实现过程中的具体操作。其主要目的是让应用程式开发人员得以呼叫一组例程功能，而无须考虑其底层的原始码">
+    <meta name="description" content="​本文从如何构建API的基础开始介绍，并举以案例，然后再讲解如何使用Gin优化。然后再讲解什么是用户认证，以及用户认证的分类，最后再举例使用API实现用户身份认证的案例。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="如何将我的服务开放给用户：构建API接口和用户认证的实践指南">
 <meta property="og:url" content="http://example.com/2023/09/04/post/index.html">
 <meta property="og:site_name" content="BaiZer&#39;s Blog">
-<meta property="og:description" content="​ 一、构建API接口：1.什么是API？API是应用程序编程接口的缩写，是一些预先定义的函数，或指软件系统不同组成部分衔接的约定，用来提供应用程序与开发人员基于某软件或硬件得以访问的一组例程，而又无需访问原码，或理解内部工作机制的细节。 API本身是抽象的，它仅定义了一个界面，而不涉及应用程序在实际实现过程中的具体操作。其主要目的是让应用程式开发人员得以呼叫一组例程功能，而无须考虑其底层的原始码">
+<meta property="og:description" content="​本文从如何构建API的基础开始介绍，并举以案例，然后再讲解如何使用Gin优化。然后再讲解什么是用户认证，以及用户认证的分类，最后再举例使用API实现用户身份认证的案例。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-04T15:54:14.000Z">
-<meta property="article:modified_time" content="2023-09-04T15:58:59.052Z">
+<meta property="article:modified_time" content="2023-09-04T16:08:33.105Z">
 <meta property="article:author" content="BaiZer">
 <meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary_large_image">
@@ -232,7 +232,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/head5.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -322,8 +322,7 @@
             
               <div class="markdown-body">
                 
-                <p>​</p>
-<h1 id="一、构建API接口："><a href="#一、构建API接口：" class="headerlink" title="一、构建API接口："></a>一、构建API接口：</h1><h2 id="1-什么是API？"><a href="#1-什么是API？" class="headerlink" title="1.什么是API？"></a>1.什么是API？</h2><p>API是<strong>应用程序编程接口</strong>的缩写，是一些预先定义的函数，或指软件系统不同组成部分衔接的约定，用来提供应用程序与开发人员基于某软件或硬件得以访问的一组例程，而又无需访问原码，或理解内部工作机制的细节。</p>
+                <h1 id="一、构建API接口："><a href="#一、构建API接口：" class="headerlink" title="一、构建API接口："></a>一、构建API接口：</h1><h2 id="1-什么是API？"><a href="#1-什么是API？" class="headerlink" title="1.什么是API？"></a>1.什么是API？</h2><p>API是<strong>应用程序编程接口</strong>的缩写，是一些预先定义的函数，或指软件系统不同组成部分衔接的约定，用来提供应用程序与开发人员基于某软件或硬件得以访问的一组例程，而又无需访问原码，或理解内部工作机制的细节。</p>
 <p>API本身是抽象的，它仅定义了一个界面，而不涉及应用程序在实际实现过程中的具体操作。其主要目的是让应用程式开发人员得以呼叫一组例程功能，而无须考虑其底层的原始码为何、或理解其内部工作机制的细节。</p>
 <h2 id="2-构建基础API："><a href="#2-构建基础API：" class="headerlink" title="2.构建基础API："></a>2.构建基础API：</h2><p>在使用GO语言创建简单API时，需要使用标准库中的net&#x2F;http包来处理HTTP请求和响应。</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs js">package main<br><br><span class="hljs-keyword">import</span> (<br>    <span class="hljs-string">&quot;fmt&quot;</span><br>    <span class="hljs-string">&quot;log&quot;</span><br>    <span class="hljs-string">&quot;net/http&quot;</span><br>)<br><br>func <span class="hljs-title function_">helloHandler</span>(<span class="hljs-params">w http.ResponseWriter, r *http.Request</span>) &#123;<br>    fmt.<span class="hljs-title class_">Fprintf</span>(w, <span class="hljs-string">&quot;Hello！&quot;</span>)<br>&#125;<br><br>func <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) &#123;<br>    http.<span class="hljs-title class_">HandleFunc</span>(<span class="hljs-string">&quot;/&quot;</span>, helloHandler)<br>    http.<span class="hljs-title class_">ListenAndServe</span>(<span class="hljs-string">&quot;:8080&quot;</span>, nil)<br>&#125;<br><br></code></pre></td></tr></table></figure>
